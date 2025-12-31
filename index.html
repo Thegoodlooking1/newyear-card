@@ -1,450 +1,377 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>New Year</title>
+  <title>Happy New Year</title>
+  <meta name="description" content="A playful New Year card with confetti + neon motion." />
+
   <style>
     :root{
       --bg:#000;
       --fg:#fff;
-      --grid: rgba(255,255,255,.10);
-      --grid2: rgba(255,255,255,.05);
-      --max: 1100px;
-      --pad: clamp(16px, 4vw, 40px);
-      --gap: clamp(14px, 2.4vw, 22px);
-      --hair: 1px;
+      --muted:rgba(255,255,255,.68);
+      --grid:rgba(255,255,255,.09);
+      --grid-strong:rgba(255,255,255,.14);
+      --maxw: 980px;
     }
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
+    /* Reset */
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
     body{
       margin:0;
-      background:var(--bg);
-      color:var(--fg);
-      font-family: Helvetica, Arial, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", sans-serif;
+      font-family: Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
       overflow:hidden;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      touch-action: none; /* enables smooth pointer/touch interactions */
     }
 
-    /* ===== Background (futuristic neon, behind everything) ===== */
-    .bg{
+    /* Swiss grid background */
+    .grid{
       position:fixed; inset:0;
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+        linear-gradient(var(--grid-strong) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-strong) 1px, transparent 1px);
+      background-size:
+        24px 24px,
+        24px 24px,
+        120px 120px,
+        120px 120px;
+      background-position:
+        0 0,
+        0 0,
+        0 0,
+        0 0;
       pointer-events:none;
-      z-index:0;
-      background:
-        radial-gradient(900px 500px at 15% 25%, rgba(0,255,255,.15), transparent 55%),
-        radial-gradient(900px 500px at 85% 35%, rgba(255,0,255,.14), transparent 55%),
-        radial-gradient(1000px 600px at 50% 85%, rgba(0,255,140,.10), transparent 60%),
-        linear-gradient(#000, #000);
-      filter: saturate(1.2) contrast(1.05);
+      opacity:.7;
     }
 
-    .bg::before{
-      content:"";
-      position:absolute; inset:-20%;
-      background:
-        radial-gradient(closest-side, rgba(0,255,255,.22), transparent 70%),
-        radial-gradient(closest-side, rgba(255,0,255,.20), transparent 70%),
-        radial-gradient(closest-side, rgba(0,255,140,.16), transparent 70%);
-      mix-blend-mode: screen;
-      animation: drift 14s ease-in-out infinite;
-      transform: translate3d(0,0,0);
-      opacity:.9;
+    /* Neon motion (lightweight CSS layers) */
+    .neon{
+      position:fixed; inset:-20%;
+      pointer-events:none;
+      filter: blur(28px) saturate(1.3);
+      opacity:.85;
+      transform: translateZ(0);
+      will-change: transform;
     }
-
-    .bg::after{
+    .neon::before,
+    .neon::after{
       content:"";
       position:absolute; inset:0;
       background:
-        repeating-linear-gradient(
-          to bottom,
-          rgba(255,255,255,.05),
-          rgba(255,255,255,.05) 1px,
-          transparent 1px,
-          transparent 6px
-        );
-      opacity:.08;
-      mix-blend-mode: overlay;
-      animation: scan 6.5s linear infinite;
+        radial-gradient( circle at 20% 30%, rgba(0,255,255,.45), transparent 40%),
+        radial-gradient( circle at 75% 25%, rgba(255,0,200,.35), transparent 45%),
+        radial-gradient( circle at 65% 75%, rgba(0,255,120,.28), transparent 45%),
+        radial-gradient( circle at 25% 80%, rgba(255,180,0,.24), transparent 48%);
+      mix-blend-mode: screen;
+      transform: translate3d(0,0,0);
+      animation: drift1 12s linear infinite;
+    }
+    .neon::after{
+      opacity:.7;
+      animation: drift2 16s linear infinite reverse;
+    }
+    @keyframes drift1{
+      0%   { transform: translate3d(-2%, -1%, 0) scale(1.05) rotate(0deg); }
+      50%  { transform: translate3d( 2%,  2%, 0) scale(1.08) rotate(8deg); }
+      100% { transform: translate3d(-2%, -1%, 0) scale(1.05) rotate(0deg); }
+    }
+    @keyframes drift2{
+      0%   { transform: translate3d( 2%,  1%, 0) scale(1.02) rotate(0deg); }
+      50%  { transform: translate3d(-2%, -2%, 0) scale(1.06) rotate(-10deg); }
+      100% { transform: translate3d( 2%,  1%, 0) scale(1.02) rotate(0deg); }
     }
 
-    @keyframes drift{
-      0%   { transform: translate(-4%, -2%) rotate(0deg) scale(1.03); }
-      50%  { transform: translate(5%, 3%) rotate(6deg) scale(1.06); }
-      100% { transform: translate(-4%, -2%) rotate(0deg) scale(1.03); }
-    }
-
-    @keyframes scan{
-      0% { transform: translateY(-20px); }
-      100% { transform: translateY(20px); }
-    }
-
-    /* ===== Swiss grid overlay ===== */
-    .grid{
+    /* Subtle vignette to keep text readable */
+    .vignette{
       position:fixed; inset:0;
       pointer-events:none;
-      z-index:1;
       background:
-        linear-gradient(var(--grid) var(--hair), transparent var(--hair)) 0 0 / 100% 12px,
-        linear-gradient(90deg, var(--grid2) var(--hair), transparent var(--hair)) 0 0 / 12px 100%;
-      opacity:.9;
-      mask-image: radial-gradient(circle at 50% 35%, rgba(0,0,0,1), rgba(0,0,0,.75) 45%, rgba(0,0,0,.25) 70%, transparent 100%);
+        radial-gradient(circle at 50% 40%, rgba(0,0,0,0) 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.7) 100%);
     }
 
-    /* ===== Layout ===== */
+    /* Canvas on top */
+    canvas#confetti{
+      position:fixed; inset:0;
+      width:100%; height:100%;
+      pointer-events:none; /* interaction captured by document */
+    }
+
+    /* Content using Swiss grid layout */
     .wrap{
       position:relative;
-      z-index:2;
       height:100%;
       display:flex;
+      align-items:flex-start;
       justify-content:center;
-      align-items:center;
-      padding: var(--pad);
+      padding: clamp(18px, 4vw, 56px);
+      padding-top: clamp(22px, 6vh, 72px);
     }
 
     .content{
-      width:min(var(--max), 100%);
+      width:min(var(--maxw), 100%);
       display:grid;
       grid-template-columns: repeat(12, 1fr);
-      gap: var(--gap);
-      align-content:center;
+      gap: 16px;
     }
 
-    .title{
+    .headline{
       grid-column: 1 / -1;
-      font-size: clamp(34px, 5.6vw, 70px);
-      line-height: 1.02;
-      letter-spacing: -0.02em;
-      text-transform: uppercase;
-      margin:0;
+      letter-spacing:-0.03em;
+      line-height:1.02;
+      font-size: clamp(44px, 8vw, 84px);
+      margin:0 0 10px 0;
     }
 
     .sub{
-      grid-column: 1 / 9;
-      font-size: clamp(16px, 2.2vw, 22px);
-      line-height: 1.35;
+      grid-column: 1 / span 8;
+      font-size: clamp(14px, 2.4vw, 18px);
+      line-height:1.55;
+      color: var(--muted);
       margin:0;
-      opacity:.92;
-      max-width: 60ch;
     }
 
     .meta{
-      grid-column: 1 / 7;
+      grid-column: 1 / span 6;
+      margin-top: 22px;
       display:flex;
+      gap: 12px;
       flex-wrap:wrap;
-      gap: 10px 14px;
-      margin-top: 10px;
-      font-size: 12px;
-      letter-spacing:.06em;
+      align-items:center;
+      color: var(--muted);
+      font-size: 13px;
       text-transform: uppercase;
-      opacity:.8;
+      letter-spacing: .12em;
     }
 
-    .meta span{
+    .pill{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:6px 10px;
-      border:1px solid rgba(255,255,255,.18);
+      padding: 10px 12px;
+      border:1px solid rgba(255,255,255,.16);
       background: rgba(0,0,0,.35);
       backdrop-filter: blur(6px);
     }
 
+    /* Instruction line for mobile */
     .hint{
-      grid-column: 1 / 7;
-      margin-top: 18px;
+      grid-column: 1 / span 7;
+      margin-top: 14px;
+      font-size: 13px;
+      color: rgba(255,255,255,.55);
+      letter-spacing: .02em;
+    }
+
+    /* Small footer */
+    .footer{
+      position:fixed;
+      left: clamp(18px, 4vw, 56px);
+      bottom: clamp(16px, 3vw, 40px);
+      color: rgba(255,255,255,.35);
       font-size: 12px;
-      line-height: 1.35;
-      opacity: .70;
+      letter-spacing:.02em;
+      user-select:none;
     }
 
-    /* subtle neon “edge glow” around text, still brutalist */
-    .glow{
-      text-shadow:
-        0 0 14px rgba(0,255,255,.12),
-        0 0 18px rgba(255,0,255,.10),
-        0 0 22px rgba(0,255,140,.08);
-    }
-
-    /* mobile adjustments */
-    @media (max-width: 700px){
-      .sub{ grid-column: 1 / -1; }
-      .meta, .hint{ grid-column: 1 / -1; }
-    }
-
-    /* ===== Confetti canvas ===== */
-    canvas#confetti{
-      position:fixed;
-      inset:0;
-      z-index:3;
-      pointer-events:none; /* allows scrolling/taps to pass to body; we capture with listeners */
-    }
-
-    /* ===== Optional Three-ish starfield (no library) ===== */
-    canvas#stars{
-      position:fixed;
-      inset:0;
-      z-index:0; /* behind bg drift; but we draw faint */
-      pointer-events:none;
-      opacity:.55;
-      mix-blend-mode: screen;
-    }
-
-    /* small accessibility: reduce motion */
+    /* Reduce motion preference */
     @media (prefers-reduced-motion: reduce){
-      .bg::before,.bg::after{ animation:none; }
+      .neon::before,.neon::after{ animation:none; }
     }
   </style>
 </head>
 
 <body>
-  <canvas id="stars"></canvas>
-  <div class="bg"></div>
-  <div class="grid"></div>
-
-  <main class="wrap">
-    <section class="content">
-      <h1 class="title glow" id="headline">Happy New Year, Friend.</h1>
-      <p class="sub glow" id="message">
-        Wishing you a clean start, loud laughter, and a year that feels like forward motion.
-        <br/>Move your finger (or mouse) to paint confetti across the night.
-      </p>
-
-      <div class="meta">
-        <span id="toLine">TO: You</span>
-        <span id="fromLine">FROM: Ingsa</span>
-        <span id="yearLine">2026</span>
-      </div>
-
-      <p class="hint">
-        Mobile: drag your finger for confetti • tap once for a burst.
-        Desktop: move mouse for confetti • click for a burst.
-      </p>
-    </section>
-  </main>
+  <div class="neon" aria-hidden="true"></div>
+  <div class="grid" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
 
   <canvas id="confetti"></canvas>
 
+  <main class="wrap">
+    <section class="content">
+      <h1 class="headline" id="title">Happy New Year, friend.</h1>
+
+      <p class="sub" id="message">
+        Wishing you a year of momentum, good health, and clean new beginnings.
+        Here’s a small burst of joy from my corner of the world.
+      </p>
+
+      <div class="meta" aria-label="Details">
+        <div class="pill"><span>2026</span><span style="opacity:.6">/</span><span id="toName">for you</span></div>
+        <div class="pill"><span id="fromName">— Ingsa</span></div>
+      </div>
+
+      <div class="hint" id="hint">
+        Move your cursor to spray confetti. On phone: tap/drag anywhere.
+      </div>
+    </section>
+  </main>
+
+  <div class="footer">Built with love + a little chaos.</div>
+
   <script>
-    /**********************
-     * Personalization via URL params
-     * Example:
-     *   ?to=Riya&from=Ingsa&msg=Go%20big%20this%20year
-     **********************/
+    // ----------------------------
+    // Personalization via URL params:
+    // ?to=Alex&from=Ingsa&msg=Your%20message%20here
+    // ----------------------------
     const params = new URLSearchParams(location.search);
-    const to = (params.get("to") || "Friend").trim();
-    const from = (params.get("from") || "Ingsa").trim();
+    const to = params.get("to");
+    const from = params.get("from");
     const msg = params.get("msg");
-    const year = params.get("year") || "2026";
+    const year = params.get("year");
 
-    const headline = document.getElementById("headline");
-    const message = document.getElementById("message");
-    document.getElementById("toLine").textContent = `TO: ${to}`;
-    document.getElementById("fromLine").textContent = `FROM: ${from}`;
-    document.getElementById("yearLine").textContent = year;
+    const toNameEl = document.getElementById("toName");
+    const fromNameEl = document.getElementById("fromName");
+    const msgEl = document.getElementById("message");
+    const titleEl = document.getElementById("title");
 
-    headline.textContent = `Happy New Year, ${to}.`;
-    if (msg && msg.trim().length) {
-      message.textContent = decodeURIComponent(msg).trim();
+    if (to && to.trim()) {
+      toNameEl.textContent = to.trim();
+      titleEl.textContent = `Happy New Year, ${to.trim()}.`;
+    }
+    if (from && from.trim()) fromNameEl.textContent = `— ${from.trim()}`;
+    if (msg && msg.trim()) msgEl.textContent = msg.trim();
+    if (year && year.trim()) {
+      // If you pass ?year=2026 it replaces "2026" in the pill (kept simple)
+      document.querySelector(".meta .pill span").textContent = year.trim();
     }
 
-    /**********************
-     * Futuristic starfield (lightweight, no three.js)
-     **********************/
-    const starsCanvas = document.getElementById("stars");
-    const sctx = starsCanvas.getContext("2d", { alpha: true });
+    // ----------------------------
+    // Lightweight confetti
+    // - Uses a single canvas
+    // - Caps particle count
+    // - Optimized drawing
+    // - Works with mouse + touch
+    // ----------------------------
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d", { alpha: true });
 
-    let sw = 0, sh = 0, dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-    let stars = [];
-
-    function resizeStars(){
-      dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-      sw = Math.floor(innerWidth * dpr);
-      sh = Math.floor(innerHeight * dpr);
-      starsCanvas.width = sw;
-      starsCanvas.height = sh;
-      starsCanvas.style.width = innerWidth + "px";
-      starsCanvas.style.height = innerHeight + "px";
-
-      const count = Math.floor((innerWidth * innerHeight) / 12000);
-      stars = new Array(count).fill(0).map(() => ({
-        x: Math.random() * sw,
-        y: Math.random() * sh,
-        z: Math.random() * 1 + 0.25,
-        v: (Math.random() * 0.9 + 0.4) * dpr
-      }));
+    function resize() {
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1)); // cap DPR
+      canvas.width = Math.floor(innerWidth * dpr);
+      canvas.height = Math.floor(innerHeight * dpr);
+      canvas.style.width = innerWidth + "px";
+      canvas.style.height = innerHeight + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
+    addEventListener("resize", resize, { passive: true });
+    resize();
 
-    function drawStars(t){
-      sctx.clearRect(0,0,sw,sh);
-      const tt = t * 0.00008;
-      for (const p of stars){
-        p.y += p.v * p.z;
-        if (p.y > sh) { p.y = -5; p.x = Math.random() * sw; }
-        const twinkle = 0.4 + 0.6 * Math.sin(tt * 2000 * p.z + p.x * 0.001);
-        const r = (1.1 + 1.7 * p.z) * dpr;
-        sctx.beginPath();
-        sctx.arc(p.x, p.y, r, 0, Math.PI*2);
-        sctx.fillStyle = `rgba(140,255,255,${0.08 * twinkle})`;
-        sctx.fill();
-      }
-      requestAnimationFrame(drawStars);
-    }
+    // Neon-ish palette (confetti only; background stays B/W grid + neon glow)
+    const COLORS = ["#00F5FF", "#FF2BD6", "#7CFF00", "#FFD400", "#A56CFF", "#FFFFFF"];
 
-    resizeStars();
-    requestAnimationFrame(drawStars);
-    addEventListener("resize", resizeStars);
+    const particles = [];
+    const MAX_PARTICLES = 650;      // keep safe for laptops
+    const EMIT_PER_EVENT = 12;      // confetti per move/tap
+    const GRAVITY = 720;            // px/s^2
+    const DRAG = 0.985;
 
-    /**********************
-     * Confetti (desktop + mobile)
-     **********************/
-    const c = document.getElementById("confetti");
-    const ctx = c.getContext("2d", { alpha: true });
+    function rand(min, max){ return Math.random() * (max - min) + min; }
 
-    let w=0,h=0;
-    function resizeConfetti(){
-      dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-      w = Math.floor(innerWidth * dpr);
-      h = Math.floor(innerHeight * dpr);
-      c.width = w;
-      c.height = h;
-      c.style.width = innerWidth + "px";
-      c.style.height = innerHeight + "px";
-    }
-    resizeConfetti();
-    addEventListener("resize", resizeConfetti);
+    function emit(x, y, amount){
+      for (let i = 0; i < amount; i++){
+        if (particles.length >= MAX_PARTICLES) particles.shift();
 
-    const confetti = [];
-    const neon = ["#00FFFF","#FF00FF","#00FF8C","#7C5CFF","#FF3D00","#00A3FF"];
+        const angle = rand(-Math.PI, 0);        // spray upward
+        const speed = rand(220, 720);
+        const vx = Math.cos(angle) * speed + rand(-120, 120);
+        const vy = Math.sin(angle) * speed - rand(80, 160);
 
-    function rand(min,max){ return Math.random()*(max-min)+min; }
-
-    function spawn(x,y,amount=10,burst=false){
-      for(let i=0;i<amount;i++){
-        const a = burst ? rand(0, Math.PI*2) : rand(-0.7, 0.7);
-        const sp = burst ? rand(5, 14) : rand(2, 8);
-        confetti.push({
+        particles.push({
           x, y,
-          vx: Math.cos(a)*sp*dpr + rand(-1,1),
-          vy: Math.sin(a)*sp*dpr + (burst ? rand(-6,2) : rand(-2,2)),
-          g: rand(0.08, 0.18)*dpr,
-          r: rand(2, 5)*dpr,
-          rot: rand(0, Math.PI*2),
-          vr: rand(-0.18, 0.18),
-          life: rand(50, 110),
-          color: neon[Math.floor(Math.random()*neon.length)],
-          shape: Math.random() < 0.55 ? "rect" : "circle"
+          vx, vy,
+          w: rand(3, 7),
+          h: rand(5, 11),
+          r: rand(0, Math.PI),
+          vr: rand(-6, 6),
+          life: rand(0.75, 1.35),
+          age: 0,
+          color: COLORS[(Math.random() * COLORS.length) | 0],
         });
       }
-      if (confetti.length > 1200) confetti.splice(0, confetti.length - 1200);
     }
 
-    function draw(){
-      ctx.clearRect(0,0,w,h);
+    let lastEmit = 0;
+    function throttledEmit(x, y){
+      const now = performance.now();
+      if (now - lastEmit < 16) return; // ~60fps throttle
+      lastEmit = now;
+      emit(x, y, EMIT_PER_EVENT);
+    }
 
-      // glow trail layer (subtle)
-      ctx.globalCompositeOperation = "lighter";
+    // Mouse
+    addEventListener("mousemove", (e) => {
+      throttledEmit(e.clientX, e.clientY);
+    }, { passive: true });
 
-      for (let i = confetti.length - 1; i >= 0; i--){
-        const p = confetti[i];
-        p.vy += p.g;
-        p.x += p.vx;
-        p.y += p.vy;
-        p.rot += p.vr;
-        p.life--;
+    // Touch (mobile): tap + drag
+    addEventListener("touchstart", (e) => {
+      const t = e.touches && e.touches[0];
+      if (!t) return;
+      throttledEmit(t.clientX, t.clientY);
+    }, { passive: true });
 
-        const alpha = Math.max(0, Math.min(1, p.life / 90));
+    addEventListener("touchmove", (e) => {
+      const t = e.touches && e.touches[0];
+      if (!t) return;
+      throttledEmit(t.clientX, t.clientY);
+    }, { passive: true });
+
+    // Optional: quick burst on click/tap
+    addEventListener("click", (e) => emit(e.clientX, e.clientY, 26), { passive: true });
+
+    let lastTime = performance.now();
+    function tick(t){
+      const dt = Math.min(0.033, (t - lastTime) / 1000);
+      lastTime = t;
+
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+      for (let i = particles.length - 1; i >= 0; i--){
+        const p = particles[i];
+        p.age += dt;
+        if (p.age >= p.life){
+          particles.splice(i, 1);
+          continue;
+        }
+
+        // physics
+        p.vx *= DRAG;
+        p.vy = p.vy * DRAG + GRAVITY * dt;
+
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.r += p.vr * dt;
+
+        // fade out near the end
+        const fade = 1 - (p.age / p.life);
+        const alpha = Math.max(0, Math.min(1, fade));
 
         ctx.save();
+        ctx.globalAlpha = alpha;
         ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
+        ctx.rotate(p.r);
 
-        // outer glow
-        ctx.shadowBlur = 18 * dpr;
-        ctx.shadowColor = p.color;
+        // draw as small rectangle confetti
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
 
-        ctx.fillStyle = hexToRgba(p.color, 0.85 * alpha);
-
-        if (p.shape === "rect"){
-          ctx.fillRect(-p.r*1.2, -p.r*0.8, p.r*2.4, p.r*1.6);
-        } else {
-          ctx.beginPath();
-          ctx.arc(0,0,p.r,0,Math.PI*2);
-          ctx.fill();
-        }
         ctx.restore();
-
-        if (p.life <= 0 || p.y > h + 80*dpr || p.x < -80*dpr || p.x > w + 80*dpr){
-          confetti.splice(i,1);
-        }
       }
 
-      ctx.globalCompositeOperation = "source-over";
-      requestAnimationFrame(draw);
+      requestAnimationFrame(tick);
     }
-    requestAnimationFrame(draw);
+    requestAnimationFrame(tick);
 
-    function hexToRgba(hex, a){
-      const c = hex.replace("#","");
-      const bigint = parseInt(c, 16);
-      const r = (bigint >> 16) & 255;
-      const g = (bigint >> 8) & 255;
-      const b = bigint & 255;
-      return `rgba(${r},${g},${b},${a})`;
-    }
-
-    // unified pointer handler (covers mouse + touch + pen)
-    let last = null;
-    function onPointerMove(e){
-      const x = (e.clientX || (e.touches && e.touches[0].clientX)) ?? 0;
-      const y = (e.clientY || (e.touches && e.touches[0].clientY)) ?? 0;
-
-      const px = x * dpr;
-      const py = y * dpr;
-
-      if (!last){
-        last = {x:px, y:py};
-        spawn(px, py, 14, false);
-        return;
-      }
-
-      // spawn along path for smoother trails
-      const dx = px - last.x;
-      const dy = py - last.y;
-      const dist = Math.hypot(dx, dy);
-      const steps = Math.max(1, Math.floor(dist / (14*dpr)));
-
-      for(let i=1;i<=steps;i++){
-        const ix = last.x + (dx * i/steps);
-        const iy = last.y + (dy * i/steps);
-        spawn(ix, iy, 6, false);
-      }
-
-      last.x = px; last.y = py;
-    }
-
-    function onPointerDown(e){
-      const x = (e.clientX || (e.touches && e.touches[0].clientX)) ?? innerWidth/2;
-      const y = (e.clientY || (e.touches && e.touches[0].clientY)) ?? innerHeight/2;
-      spawn(x*dpr, y*dpr, 80, true); // burst
-      last = {x:x*dpr, y:y*dpr};
-    }
-
-    function onPointerUp(){
-      last = null;
-    }
-
-    // Pointer Events (best cross-device)
-    addEventListener("pointerdown", (e)=>{ onPointerDown(e); });
-    addEventListener("pointermove", (e)=>{ onPointerMove(e); });
-    addEventListener("pointerup", onPointerUp);
-    addEventListener("pointercancel", onPointerUp);
-
-    // Prevent iOS “rubber band” scrolling while interacting
-    addEventListener("touchmove", (e)=> e.preventDefault(), { passive:false });
+    // Small performance hint for slower devices:
+    // If you want it even lighter, reduce MAX_PARTICLES to ~350 and EMIT_PER_EVENT to ~8.
   </script>
 </body>
 </html>
