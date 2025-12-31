@@ -2,530 +2,449 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Happy New Year ✦</title>
-
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>New Year</title>
   <style>
-    :root {
-      --bg: #000;
-      --fg: #fff;
-      --muted: rgba(255,255,255,0.72);
-      --grid-gap: 20px;
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --grid: rgba(255,255,255,.10);
+      --grid2: rgba(255,255,255,.05);
       --max: 1100px;
+      --pad: clamp(16px, 4vw, 40px);
+      --gap: clamp(14px, 2.4vw, 22px);
+      --hair: 1px;
     }
 
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--fg);
-      font-family: Helvetica, Arial, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      overflow: hidden;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--fg);
+      font-family: Helvetica, Arial, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", sans-serif;
+      overflow:hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      touch-action: none; /* enables smooth pointer/touch interactions */
     }
 
-    /* Three.js neon background */
-    #bg3d {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-    }
-
-    /* subtle film grain */
-    .grain {
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
-      opacity: 0.15;
-      background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
-      background-size: 220px 220px;
-      mix-blend-mode: overlay;
-      animation: grainMove 7s steps(8) infinite;
-    }
-    @keyframes grainMove {
-      0% { transform: translate3d(0,0,0); }
-      25% { transform: translate3d(-8px,6px,0); }
-      50% { transform: translate3d(6px,-10px,0); }
-      75% { transform: translate3d(12px,8px,0); }
-      100% { transform: translate3d(0,0,0); }
-    }
-
-    /* Confetti canvas on top */
-    #confetti {
-      position: fixed;
-      inset: 0;
-      z-index: 3;
-      pointer-events: none;
-    }
-
-    /* Swiss grid content */
-    .wrap {
-      position: relative;
-      z-index: 2;
-      height: 100%;
-      display: grid;
-      place-items: start;
-      padding: 28px;
-      overflow: auto;
-    }
-
-    .grid {
-      width: 100%;
-      max-width: var(--max);
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: var(--grid-gap);
-      align-content: start;
-      padding-top: 8px;
-    }
-
-    /* Thin grid lines for brutalist/swiss feel */
-    .grid::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 2;
-      opacity: 0.06;
+    /* ===== Background (futuristic neon, behind everything) ===== */
+    .bg{
+      position:fixed; inset:0;
+      pointer-events:none;
+      z-index:0;
       background:
-        linear-gradient(to right, rgba(255,255,255,0.7) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255,255,255,0.7) 1px, transparent 1px);
-      background-size: 80px 80px;
+        radial-gradient(900px 500px at 15% 25%, rgba(0,255,255,.15), transparent 55%),
+        radial-gradient(900px 500px at 85% 35%, rgba(255,0,255,.14), transparent 55%),
+        radial-gradient(1000px 600px at 50% 85%, rgba(0,255,140,.10), transparent 60%),
+        linear-gradient(#000, #000);
+      filter: saturate(1.2) contrast(1.05);
+    }
+
+    .bg::before{
+      content:"";
+      position:absolute; inset:-20%;
+      background:
+        radial-gradient(closest-side, rgba(0,255,255,.22), transparent 70%),
+        radial-gradient(closest-side, rgba(255,0,255,.20), transparent 70%),
+        radial-gradient(closest-side, rgba(0,255,140,.16), transparent 70%);
+      mix-blend-mode: screen;
+      animation: drift 14s ease-in-out infinite;
+      transform: translate3d(0,0,0);
+      opacity:.9;
+    }
+
+    .bg::after{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,.05),
+          rgba(255,255,255,.05) 1px,
+          transparent 1px,
+          transparent 6px
+        );
+      opacity:.08;
+      mix-blend-mode: overlay;
+      animation: scan 6.5s linear infinite;
+    }
+
+    @keyframes drift{
+      0%   { transform: translate(-4%, -2%) rotate(0deg) scale(1.03); }
+      50%  { transform: translate(5%, 3%) rotate(6deg) scale(1.06); }
+      100% { transform: translate(-4%, -2%) rotate(0deg) scale(1.03); }
+    }
+
+    @keyframes scan{
+      0% { transform: translateY(-20px); }
+      100% { transform: translateY(20px); }
+    }
+
+    /* ===== Swiss grid overlay ===== */
+    .grid{
+      position:fixed; inset:0;
+      pointer-events:none;
+      z-index:1;
+      background:
+        linear-gradient(var(--grid) var(--hair), transparent var(--hair)) 0 0 / 100% 12px,
+        linear-gradient(90deg, var(--grid2) var(--hair), transparent var(--hair)) 0 0 / 12px 100%;
+      opacity:.9;
+      mask-image: radial-gradient(circle at 50% 35%, rgba(0,0,0,1), rgba(0,0,0,.75) 45%, rgba(0,0,0,.25) 70%, transparent 100%);
+    }
+
+    /* ===== Layout ===== */
+    .wrap{
+      position:relative;
+      z-index:2;
+      height:100%;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding: var(--pad);
+    }
+
+    .content{
+      width:min(var(--max), 100%);
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: var(--gap);
+      align-content:center;
+    }
+
+    .title{
+      grid-column: 1 / -1;
+      font-size: clamp(34px, 5.6vw, 70px);
+      line-height: 1.02;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      margin:0;
+    }
+
+    .sub{
+      grid-column: 1 / 9;
+      font-size: clamp(16px, 2.2vw, 22px);
+      line-height: 1.35;
+      margin:0;
+      opacity:.92;
+      max-width: 60ch;
+    }
+
+    .meta{
+      grid-column: 1 / 7;
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px 14px;
+      margin-top: 10px;
+      font-size: 12px;
+      letter-spacing:.06em;
+      text-transform: uppercase;
+      opacity:.8;
+    }
+
+    .meta span{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(6px);
+    }
+
+    .hint{
+      grid-column: 1 / 7;
+      margin-top: 18px;
+      font-size: 12px;
+      line-height: 1.35;
+      opacity: .70;
+    }
+
+    /* subtle neon “edge glow” around text, still brutalist */
+    .glow{
+      text-shadow:
+        0 0 14px rgba(0,255,255,.12),
+        0 0 18px rgba(255,0,255,.10),
+        0 0 22px rgba(0,255,140,.08);
+    }
+
+    /* mobile adjustments */
+    @media (max-width: 700px){
+      .sub{ grid-column: 1 / -1; }
+      .meta, .hint{ grid-column: 1 / -1; }
+    }
+
+    /* ===== Confetti canvas ===== */
+    canvas#confetti{
+      position:fixed;
+      inset:0;
+      z-index:3;
+      pointer-events:none; /* allows scrolling/taps to pass to body; we capture with listeners */
+    }
+
+    /* ===== Optional Three-ish starfield (no library) ===== */
+    canvas#stars{
+      position:fixed;
+      inset:0;
+      z-index:0; /* behind bg drift; but we draw faint */
+      pointer-events:none;
+      opacity:.55;
       mix-blend-mode: screen;
     }
 
-    .left {
-      grid-column: 1 / 8;
-      min-width: 0;
+    /* small accessibility: reduce motion */
+    @media (prefers-reduced-motion: reduce){
+      .bg::before,.bg::after{ animation:none; }
     }
-
-    .right {
-      grid-column: 8 / 13;
-      min-width: 0;
-      align-self: start;
-    }
-
-    @media (max-width: 860px) {
-      .left, .right { grid-column: 1 / 13; }
-      .wrap { padding: 18px; }
-    }
-
-    h1 {
-      margin: 0;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 0.95;
-      font-size: clamp(44px, 6vw, 84px);
-      text-transform: uppercase;
-    }
-
-    .sub {
-      margin-top: 14px;
-      font-size: 16px;
-      line-height: 1.55;
-      color: var(--muted);
-      max-width: 55ch;
-    }
-
-    .meta {
-      margin-top: 22px;
-      display: grid;
-      gap: 10px;
-      font-size: 14px;
-      color: rgba(255,255,255,0.78);
-    }
-
-    .meta .row {
-      display: flex;
-      gap: 10px;
-      align-items: baseline;
-      flex-wrap: wrap;
-    }
-    .label {
-      opacity: 0.7;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      font-size: 12px;
-    }
-    .value {
-      font-weight: 700;
-      letter-spacing: 0.02em;
-    }
-
-    /* Brutalist neon accent line */
-    .rule {
-      margin-top: 24px;
-      height: 2px;
-      width: min(520px, 100%);
-      background: rgba(255,255,255,0.75);
-      position: relative;
-      overflow: hidden;
-    }
-    .rule::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(0,255,255,0.9), rgba(255,0,255,0.9), transparent);
-      transform: translateX(-120%);
-      animation: scan 2.4s linear infinite;
-      mix-blend-mode: screen;
-      opacity: 0.9;
-    }
-    @keyframes scan {
-      0% { transform: translateX(-120%); }
-      100% { transform: translateX(120%); }
-    }
-
-    /* Right column — “instructions” area */
-    .note {
-      margin-top: 8px;
-      font-size: 13px;
-      line-height: 1.6;
-      color: rgba(255,255,255,0.72);
-    }
-
-    .hint {
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid rgba(255,255,255,0.18);
-      font-size: 13px;
-      line-height: 1.6;
-      color: rgba(255,255,255,0.72);
-    }
-
-    .kbd {
-      display: inline-block;
-      padding: 2px 8px;
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 999px;
-      font-size: 12px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.85);
-    }
-
-    /* Small corner signature */
-    .corner {
-      position: fixed;
-      bottom: 18px;
-      left: 28px;
-      z-index: 2;
-      font-size: 12px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.55);
-      user-select: none;
-    }
-
-    /* Prevent selection glow weirdness on mobile */
-    ::selection { background: rgba(255,255,255,0.22); }
   </style>
 </head>
 
 <body>
-  <canvas id="bg3d"></canvas>
-  <div class="grain"></div>
+  <canvas id="stars"></canvas>
+  <div class="bg"></div>
+  <div class="grid"></div>
+
+  <main class="wrap">
+    <section class="content">
+      <h1 class="title glow" id="headline">Happy New Year, Friend.</h1>
+      <p class="sub glow" id="message">
+        Wishing you a clean start, loud laughter, and a year that feels like forward motion.
+        <br/>Move your finger (or mouse) to paint confetti across the night.
+      </p>
+
+      <div class="meta">
+        <span id="toLine">TO: You</span>
+        <span id="fromLine">FROM: Ingsa</span>
+        <span id="yearLine">2026</span>
+      </div>
+
+      <p class="hint">
+        Mobile: drag your finger for confetti • tap once for a burst.
+        Desktop: move mouse for confetti • click for a burst.
+      </p>
+    </section>
+  </main>
+
   <canvas id="confetti"></canvas>
 
-  <div class="wrap">
-    <div class="grid">
-      <section class="left">
-        <h1 id="title">Happy New Year</h1>
-        <div class="rule"></div>
-
-        <p class="sub" id="message">
-          Wishing you a clean start, loud momentum, and a year that actually feels like yours.
-          Move your mouse — let it rain.
-        </p>
-
-        <div class="meta">
-          <div class="row">
-            <span class="label">To</span>
-            <span class="value" id="toName">Friend</span>
-          </div>
-          <div class="row">
-            <span class="label">From</span>
-            <span class="value" id="fromName">Ingsa</span>
-          </div>
-          <div class="row">
-            <span class="label">Year</span>
-            <span class="value" id="year"></span>
-          </div>
-        </div>
-      </section>
-
-      <aside class="right">
-        <div class="note">
-          <span class="label">Interaction</span><br/>
-          Confetti follows your cursor. Neon system runs underneath like a quiet club in the walls.
-        </div>
-
-        <div class="hint">
-          <span class="label">Personalize</span><br/>
-          Add <span class="kbd">?to=Name</span> and optionally <span class="kbd">&from=YourName</span><br/>
-          Example: <span class="kbd">?to=Alex&from=Ingsa</span>
-        </div>
-
-        <div class="hint">
-          <span class="label">Secret</span><br/>
-          Press <span class="kbd">C</span> to trigger a confetti burst.
-        </div>
-      </aside>
-    </div>
-  </div>
-
-  <div class="corner">NEW YEAR CARD / BLACK–WHITE / NEON FIELD</div>
-
-  <!-- Three.js (CDN) -->
-  <script type="module">
-    import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
-
-    // -----------------------------
-    // Personalization via URL params
-    // -----------------------------
+  <script>
+    /**********************
+     * Personalization via URL params
+     * Example:
+     *   ?to=Riya&from=Ingsa&msg=Go%20big%20this%20year
+     **********************/
     const params = new URLSearchParams(location.search);
-    const to = params.get("to")?.trim();
-    const from = params.get("from")?.trim();
-    const msg = params.get("msg")?.trim();
+    const to = (params.get("to") || "Friend").trim();
+    const from = (params.get("from") || "Ingsa").trim();
+    const msg = params.get("msg");
+    const year = params.get("year") || "2026";
 
-    document.getElementById("year").textContent = String(new Date().getFullYear());
-    if (to) document.getElementById("toName").textContent = to;
-    if (from) document.getElementById("fromName").textContent = from;
-    if (msg) document.getElementById("message").textContent = msg;
+    const headline = document.getElementById("headline");
+    const message = document.getElementById("message");
+    document.getElementById("toLine").textContent = `TO: ${to}`;
+    document.getElementById("fromLine").textContent = `FROM: ${from}`;
+    document.getElementById("yearLine").textContent = year;
 
-    // -----------------------------
-    // Neon Three.js background
-    // -----------------------------
-    const canvas = document.getElementById("bg3d");
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
-    camera.position.set(0, 0, 6);
-
-    // Subtle fog for depth
-    scene.fog = new THREE.FogExp2(0x000000, 0.14);
-
-    // Additive glowing points
-    const starCount = 1600;
-    const positions = new Float32Array(starCount * 3);
-    const colors = new Float32Array(starCount * 3);
-
-    // Neon palette
-    const palette = [
-      new THREE.Color("#00ffff"), // cyan
-      new THREE.Color("#ff00ff"), // magenta
-      new THREE.Color("#7cff00"), // acid green
-      new THREE.Color("#00a3ff"), // electric blue
-      new THREE.Color("#ff3b3b"), // neon red
-    ];
-
-    for (let i = 0; i < starCount; i++) {
-      const i3 = i * 3;
-      // Spread in a loose volume
-      positions[i3 + 0] = (Math.random() - 0.5) * 14;
-      positions[i3 + 1] = (Math.random() - 0.5) * 8;
-      positions[i3 + 2] = (Math.random() - 0.5) * 12;
-
-      const c = palette[(Math.random() * palette.length) | 0];
-      colors[i3 + 0] = c.r;
-      colors[i3 + 1] = c.g;
-      colors[i3 + 2] = c.b;
+    headline.textContent = `Happy New Year, ${to}.`;
+    if (msg && msg.trim().length) {
+      message.textContent = decodeURIComponent(msg).trim();
     }
 
-    const geom = new THREE.BufferGeometry();
-    geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    geom.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+    /**********************
+     * Futuristic starfield (lightweight, no three.js)
+     **********************/
+    const starsCanvas = document.getElementById("stars");
+    const sctx = starsCanvas.getContext("2d", { alpha: true });
 
-    const mat = new THREE.PointsMaterial({
-      size: 0.045,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.85,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    });
+    let sw = 0, sh = 0, dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    let stars = [];
 
-    const points = new THREE.Points(geom, mat);
-    scene.add(points);
+    function resizeStars(){
+      dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      sw = Math.floor(innerWidth * dpr);
+      sh = Math.floor(innerHeight * dpr);
+      starsCanvas.width = sw;
+      starsCanvas.height = sh;
+      starsCanvas.style.width = innerWidth + "px";
+      starsCanvas.style.height = innerHeight + "px";
 
-    // Energy planes (soft neon gradients)
-    function makePlane(colorA, colorB, y, speed) {
-      const planeGeo = new THREE.PlaneGeometry(14, 3, 1, 1);
-      // Simple shader-ish look via MeshBasic + vertex colors gradient
-      const planeColors = new Float32Array(4 * 3);
-      const ca = new THREE.Color(colorA);
-      const cb = new THREE.Color(colorB);
-      // top two vertices A, bottom two vertices B
-      // PlaneGeometry vertex order depends, but gradient will still read as a band
-      for (let v = 0; v < 4; v++) {
-        const isTop = v < 2;
-        const cc = isTop ? ca : cb;
-        planeColors[v * 3 + 0] = cc.r;
-        planeColors[v * 3 + 1] = cc.g;
-        planeColors[v * 3 + 2] = cc.b;
+      const count = Math.floor((innerWidth * innerHeight) / 12000);
+      stars = new Array(count).fill(0).map(() => ({
+        x: Math.random() * sw,
+        y: Math.random() * sh,
+        z: Math.random() * 1 + 0.25,
+        v: (Math.random() * 0.9 + 0.4) * dpr
+      }));
+    }
+
+    function drawStars(t){
+      sctx.clearRect(0,0,sw,sh);
+      const tt = t * 0.00008;
+      for (const p of stars){
+        p.y += p.v * p.z;
+        if (p.y > sh) { p.y = -5; p.x = Math.random() * sw; }
+        const twinkle = 0.4 + 0.6 * Math.sin(tt * 2000 * p.z + p.x * 0.001);
+        const r = (1.1 + 1.7 * p.z) * dpr;
+        sctx.beginPath();
+        sctx.arc(p.x, p.y, r, 0, Math.PI*2);
+        sctx.fillStyle = `rgba(140,255,255,${0.08 * twinkle})`;
+        sctx.fill();
       }
-      planeGeo.setAttribute("color", new THREE.BufferAttribute(planeColors, 3));
-
-      const planeMat = new THREE.MeshBasicMaterial({
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.10,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-        side: THREE.DoubleSide
-      });
-
-      const mesh = new THREE.Mesh(planeGeo, planeMat);
-      mesh.position.set(0, y, -2.2);
-      mesh.userData.speed = speed;
-      scene.add(mesh);
-      return mesh;
+      requestAnimationFrame(drawStars);
     }
 
-    const band1 = makePlane("#00ffff", "#ff00ff", 1.7, 0.35);
-    const band2 = makePlane("#7cff00", "#00a3ff", -1.4, 0.28);
+    resizeStars();
+    requestAnimationFrame(drawStars);
+    addEventListener("resize", resizeStars);
 
-    // Mouse parallax
-    let mx = 0, my = 0;
-    window.addEventListener("mousemove", (e) => {
-      const nx = (e.clientX / innerWidth) * 2 - 1;
-      const ny = (e.clientY / innerHeight) * 2 - 1;
-      mx = nx;
-      my = ny;
-    });
+    /**********************
+     * Confetti (desktop + mobile)
+     **********************/
+    const c = document.getElementById("confetti");
+    const ctx = c.getContext("2d", { alpha: true });
 
-    function resize() {
-      const w = innerWidth;
-      const h = innerHeight;
-      renderer.setSize(w, h, false);
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
+    let w=0,h=0;
+    function resizeConfetti(){
+      dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      w = Math.floor(innerWidth * dpr);
+      h = Math.floor(innerHeight * dpr);
+      c.width = w;
+      c.height = h;
+      c.style.width = innerWidth + "px";
+      c.style.height = innerHeight + "px";
     }
-    window.addEventListener("resize", resize);
-    resize();
+    resizeConfetti();
+    addEventListener("resize", resizeConfetti);
 
-    const clock = new THREE.Clock();
+    const confetti = [];
+    const neon = ["#00FFFF","#FF00FF","#00FF8C","#7C5CFF","#FF3D00","#00A3FF"];
 
-    function animate() {
-      const t = clock.getElapsedTime();
+    function rand(min,max){ return Math.random()*(max-min)+min; }
 
-      // Parallax drift
-      camera.position.x = THREE.MathUtils.lerp(camera.position.x, mx * 0.35, 0.06);
-      camera.position.y = THREE.MathUtils.lerp(camera.position.y, -my * 0.22, 0.06);
-      camera.lookAt(0, 0, 0);
-
-      // Slow swirl
-      points.rotation.y = t * 0.08;
-      points.rotation.x = Math.sin(t * 0.22) * 0.06;
-
-      // Move energy bands horizontally (wrap)
-      for (const band of [band1, band2]) {
-        band.position.x = ((t * band.userData.speed) % 6) - 3;
-        band.rotation.z = Math.sin(t * 0.9) * 0.05;
-      }
-
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
-    }
-    animate();
-
-    // -----------------------------
-    // Confetti (mouse-follow)
-    // -----------------------------
-    const confCanvas = document.getElementById("confetti");
-    const ctx = confCanvas.getContext("2d");
-
-    function resizeConf() {
-      confCanvas.width = Math.floor(innerWidth * Math.min(devicePixelRatio, 2));
-      confCanvas.height = Math.floor(innerHeight * Math.min(devicePixelRatio, 2));
-      confCanvas.style.width = innerWidth + "px";
-      confCanvas.style.height = innerHeight + "px";
-      ctx.setTransform(Math.min(devicePixelRatio, 2), 0, 0, Math.min(devicePixelRatio, 2), 0, 0);
-    }
-    window.addEventListener("resize", resizeConf);
-    resizeConf();
-
-    const pieces = [];
-    const neon = ["#00ffff", "#ff00ff", "#7cff00", "#00a3ff", "#ff3b3b"];
-
-    function spawnConfetti(x, y, amount = 18, force = 1) {
-      for (let i = 0; i < amount; i++) {
-        const angle = (Math.random() * Math.PI * 2);
-        const speed = (2 + Math.random() * 5) * force;
-
-        pieces.push({
+    function spawn(x,y,amount=10,burst=false){
+      for(let i=0;i<amount;i++){
+        const a = burst ? rand(0, Math.PI*2) : rand(-0.7, 0.7);
+        const sp = burst ? rand(5, 14) : rand(2, 8);
+        confetti.push({
           x, y,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed - (2.2 * force),
-          g: 0.16 + Math.random() * 0.07,
-          r: 2 + Math.random() * 4,
-          a: 1,
-          spin: (Math.random() - 0.5) * 0.4,
-          rot: Math.random() * Math.PI,
-          color: neon[(Math.random() * neon.length) | 0],
-          life: 70 + (Math.random() * 40) | 0
+          vx: Math.cos(a)*sp*dpr + rand(-1,1),
+          vy: Math.sin(a)*sp*dpr + (burst ? rand(-6,2) : rand(-2,2)),
+          g: rand(0.08, 0.18)*dpr,
+          r: rand(2, 5)*dpr,
+          rot: rand(0, Math.PI*2),
+          vr: rand(-0.18, 0.18),
+          life: rand(50, 110),
+          color: neon[Math.floor(Math.random()*neon.length)],
+          shape: Math.random() < 0.55 ? "rect" : "circle"
         });
       }
+      if (confetti.length > 1200) confetti.splice(0, confetti.length - 1200);
     }
 
-    let last = { x: innerWidth * 0.5, y: innerHeight * 0.4 };
-    window.addEventListener("mousemove", (e) => {
-      const dx = e.clientX - last.x;
-      const dy = e.clientY - last.y;
-      const dist = Math.hypot(dx, dy);
-      if (dist > 10) {
-        spawnConfetti(e.clientX, e.clientY, Math.min(24, 8 + (dist / 8) | 0), 0.75);
-        last = { x: e.clientX, y: e.clientY };
-      }
-    }, { passive: true });
+    function draw(){
+      ctx.clearRect(0,0,w,h);
 
-    window.addEventListener("keydown", (e) => {
-      if (e.key.toLowerCase() === "c") {
-        spawnConfetti(innerWidth * 0.35, innerHeight * 0.42, 220, 1.3);
-      }
-    });
+      // glow trail layer (subtle)
+      ctx.globalCompositeOperation = "lighter";
 
-    function tickConfetti() {
-      ctx.clearRect(0, 0, innerWidth, innerHeight);
-
-      for (let i = pieces.length - 1; i >= 0; i--) {
-        const p = pieces[i];
+      for (let i = confetti.length - 1; i >= 0; i--){
+        const p = confetti[i];
         p.vy += p.g;
         p.x += p.vx;
         p.y += p.vy;
-        p.rot += p.spin;
-        p.life -= 1;
-        p.a = Math.max(0, p.life / 110);
+        p.rot += p.vr;
+        p.life--;
 
-        // wrap-ish drift
-        if (p.y > innerHeight + 80 || p.x < -80 || p.x > innerWidth + 80 || p.a <= 0) {
-          pieces.splice(i, 1);
-          continue;
-        }
+        const alpha = Math.max(0, Math.min(1, p.life / 90));
 
         ctx.save();
-        ctx.globalAlpha = p.a;
         ctx.translate(p.x, p.y);
         ctx.rotate(p.rot);
 
-        // little neon glow
-        ctx.shadowBlur = 14;
+        // outer glow
+        ctx.shadowBlur = 18 * dpr;
         ctx.shadowColor = p.color;
-        ctx.fillStyle = p.color;
 
-        // confetti “chip”
-        ctx.fillRect(-p.r, -p.r * 0.6, p.r * 2.2, p.r * 1.1);
+        ctx.fillStyle = hexToRgba(p.color, 0.85 * alpha);
 
+        if (p.shape === "rect"){
+          ctx.fillRect(-p.r*1.2, -p.r*0.8, p.r*2.4, p.r*1.6);
+        } else {
+          ctx.beginPath();
+          ctx.arc(0,0,p.r,0,Math.PI*2);
+          ctx.fill();
+        }
         ctx.restore();
+
+        if (p.life <= 0 || p.y > h + 80*dpr || p.x < -80*dpr || p.x > w + 80*dpr){
+          confetti.splice(i,1);
+        }
       }
 
-      requestAnimationFrame(tickConfetti);
+      ctx.globalCompositeOperation = "source-over";
+      requestAnimationFrame(draw);
     }
-    tickConfetti();
+    requestAnimationFrame(draw);
+
+    function hexToRgba(hex, a){
+      const c = hex.replace("#","");
+      const bigint = parseInt(c, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `rgba(${r},${g},${b},${a})`;
+    }
+
+    // unified pointer handler (covers mouse + touch + pen)
+    let last = null;
+    function onPointerMove(e){
+      const x = (e.clientX || (e.touches && e.touches[0].clientX)) ?? 0;
+      const y = (e.clientY || (e.touches && e.touches[0].clientY)) ?? 0;
+
+      const px = x * dpr;
+      const py = y * dpr;
+
+      if (!last){
+        last = {x:px, y:py};
+        spawn(px, py, 14, false);
+        return;
+      }
+
+      // spawn along path for smoother trails
+      const dx = px - last.x;
+      const dy = py - last.y;
+      const dist = Math.hypot(dx, dy);
+      const steps = Math.max(1, Math.floor(dist / (14*dpr)));
+
+      for(let i=1;i<=steps;i++){
+        const ix = last.x + (dx * i/steps);
+        const iy = last.y + (dy * i/steps);
+        spawn(ix, iy, 6, false);
+      }
+
+      last.x = px; last.y = py;
+    }
+
+    function onPointerDown(e){
+      const x = (e.clientX || (e.touches && e.touches[0].clientX)) ?? innerWidth/2;
+      const y = (e.clientY || (e.touches && e.touches[0].clientY)) ?? innerHeight/2;
+      spawn(x*dpr, y*dpr, 80, true); // burst
+      last = {x:x*dpr, y:y*dpr};
+    }
+
+    function onPointerUp(){
+      last = null;
+    }
+
+    // Pointer Events (best cross-device)
+    addEventListener("pointerdown", (e)=>{ onPointerDown(e); });
+    addEventListener("pointermove", (e)=>{ onPointerMove(e); });
+    addEventListener("pointerup", onPointerUp);
+    addEventListener("pointercancel", onPointerUp);
+
+    // Prevent iOS “rubber band” scrolling while interacting
+    addEventListener("touchmove", (e)=> e.preventDefault(), { passive:false });
   </script>
 </body>
 </html>
