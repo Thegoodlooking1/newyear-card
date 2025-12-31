@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Happy New Year ✨</title>
+  <style>
+    :root{
+      --bg1:#07070b; --bg2:#0b1020; --card:#0f172a; --text:#e7e9ff; --muted:#aab1d6;
+      --accent:#8b5cf6; --accent2:#22c55e;
+    }
+    html,body{height:100%; margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;}
+    body{
+      overflow:hidden;
+      background: radial-gradient(1200px 800px at 20% 10%, #1b1a45 0%, var(--bg1) 45%, var(--bg2) 100%);
+      color:var(--text);
+    }
+    #three { position:fixed; inset:0; z-index:0; }
+    .grain{
+      pointer-events:none;
+      position:fixed; inset:0; z-index:1;
+      opacity:.12; mix-blend-mode:overlay;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+    }
+    .wrap{
+      position:relative; z-index:2;
+      height:100%; display:grid; place-items:center;
+      padding:20px;
+    }
+    .card{
+      width:min(720px, 94vw);
+      background: linear-gradient(180deg, rgba(15,23,42,.82), rgba(15,23,42,.62));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 28px;
+      box-shadow: 0 30px 80px rgba(0,0,0,.45);
+      padding: 28px 26px;
+      backdrop-filter: blur(10px);
+      transform: translateZ(0);
+      animation: float 4.5s ease-in-out infinite;
+    }
+    @keyframes float { 0%,100%{ transform: translateY(0)} 50%{ transform: translateY(-8px)} }
+    .top{
+      display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+      margin-bottom: 14px;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .dot{ width:10px; height:10px; border-radius:99px; background: linear-gradient(45deg,var(--accent),#60a5fa); box-shadow:0 0 18px rgba(139,92,246,.6); }
+    h1{
+      margin: 14px 0 6px;
+      font-size: clamp(30px, 5vw, 54px);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+    h1 .name{
+      background: linear-gradient(90deg, #f472b6, #60a5fa, #34d399, #f59e0b);
+      -webkit-background-clip: text; background-clip:text; color: transparent;
+      filter: drop-shadow(0 12px 26px rgba(0,0,0,.25));
+    }
+    p{
+      margin: 10px 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.55;
+    }
+    .buttons{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top: 16px;
+    }
+    button{
+      appearance:none; border:none; cursor:pointer;
+      border-radius: 16px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      color:var(--text);
+      font-weight:650;
+      letter-spacing:.01em;
+      transition: transform .08s ease, background .2s ease;
+    }
+    button:hover{ background: rgba(255,255,255,.12); }
+    button:active{ transform: translateY(1px) scale(.99); }
+    .primary{
+      background: linear-gradient(135deg, rgba(139,92,246,.95), rgba(34,197,94,.92));
+      border: none;
+      box-shadow: 0 14px 40px rgba(139,92,246,.25);
+    }
+    .footer{
+      margin-top: 14px;
+      display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap;
+      font-size: 13px; color: rgba(231,233,255,.72);
+    }
+    .tiny{ opacity:.75; }
+    a{ color: rgba(231,233,255,.9); }
+  </style>
+</head>
+
+<body>
+  <canvas id="three"></canvas>
+  <div class="grain"></div>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="top">
+        <div class="pill"><span class="dot"></span><span id="yearLabel">Happy New Year</span></div>
+        <div class="pill">✨ playful • confetti • coded</div>
+      </div>
+
+      <h1>
+        Hey <span class="name" id="toName">friend</span> —<br>
+        here’s to <span id="yearText"></span> 🥂
+      </h1>
+
+      <p id="messageLine">
+        Wishing you a year full of health, momentum, and small daily wins that quietly change everything.
+      </p>
+
+      <p class="tiny" id="noteLine" style="display:none;"></p>
+
+      <div class="buttons">
+        <button class="primary" id="celebrateBtn">Celebrate 🎉</button>
+        <button id="moreBtn">More confetti ✨</button>
+        <button id="copyBtn">Copy my link 🔗</button>
+      </div>
+
+      <div class="footer">
+        <div>From <strong id="fromName">Ingsa</strong></div>
+        <div class="tiny">Tip: add <code>?to=Name&from=You&note=...</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- Three.js (module) -->
+  <script type="module">
+    import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+
+    // --- Personalization from URL ---
+    const params = new URLSearchParams(location.search);
+    const to = params.get("to") || "friend";
+    const from = params.get("from") || "Ingsa";
+    const note = params.get("note");
+    const msg = params.get("msg");
+
+    const now = new Date();
+    const year = now.getFullYear() + 1; // Jan 1 edge? still cute as "next year"
+    document.getElementById("yearText").textContent = String(year);
+    document.getElementById("yearLabel").textContent = `Happy New Year ${year}`;
+    document.getElementById("toName").textContent = to;
+    document.getElementById("fromName").textContent = from;
+
+    if (msg) document.getElementById("messageLine").textContent = msg;
+    if (note) {
+      const el = document.getElementById("noteLine");
+      el.style.display = "block";
+      el.textContent = `PS — ${note}`;
+    }
+
+    // --- Confetti helpers ---
+    const fire = (opts={}) => confetti({
+      particleCount: 120,
+      spread: 85,
+      origin: { y: 0.65 },
+      scalar: 1.0,
+      ...opts
+    });
+
+    const burst = () => {
+      fire({ startVelocity: 45, particleCount: 160 });
+      fire({ spread: 120, particleCount: 90, scalar: 0.9 });
+      fire({ spread: 60,  particleCount: 60, scalar: 1.15 });
+    };
+
+    // Auto confetti on load (gentle)
+    setTimeout(() => fire({ particleCount: 90, spread: 70, startVelocity: 35 }), 250);
+
+    document.getElementById("celebrateBtn").addEventListener("click", burst);
+    document.getElementById("moreBtn").addEventListener("click", () => fire({ particleCount: 220, spread: 110 }));
+
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(location.href);
+        fire({ particleCount: 60, spread: 55, origin: { y: 0.8 } });
+      } catch {
+        alert("Copy failed — you can manually copy the URL from the address bar.");
+      }
+    });
+
+    // --- Three.js background ---
+    const canvas = document.getElementById("three");
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
+    camera.position.set(0, 0.25, 6);
+
+    const ambient = new THREE.AmbientLight(0xffffff, 0.55);
+    scene.add(ambient);
+
+    const key = new THREE.DirectionalLight(0xffffff, 0.9);
+    key.position.set(4, 3, 6);
+    scene.add(key);
+
+    // Fun object (toroid knot) + "confetti-ish" particles
+    const knotGeo = new THREE.TorusKnotGeometry(1.05, 0.35, 180, 18);
+    const knotMat = new THREE.MeshStandardMaterial({
+      metalness: 0.6,
+      roughness: 0.25,
+      color: 0x8b5cf6,
+      emissive: 0x111122,
+    });
+    const knot = new THREE.Mesh(knotGeo, knotMat);
+    knot.position.set(1.2, -0.2, 0);
+    scene.add(knot);
+
+    const pCount = 900;
+    const positions = new Float32Array(pCount * 3);
+    for (let i = 0; i < pCount; i++) {
+      positions[i*3+0] = (Math.random() - 0.5) * 14;
+      positions[i*3+1] = (Math.random() - 0.5) * 8;
+      positions[i*3+2] = (Math.random() - 0.5) * 10;
+    }
+    const pGeo = new THREE.BufferGeometry();
+    pGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    const pMat = new THREE.PointsMaterial({ size: 0.03, transparent: true, opacity: 0.8 });
+    const points = new THREE.Points(pGeo, pMat);
+    scene.add(points);
+
+    // Resize
+    const onResize = () => {
+      const w = innerWidth, h = innerHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    };
+    addEventListener("resize", onResize);
+    onResize();
+
+    // Animate
+    let t = 0;
+    const tick = () => {
+      t += 0.01;
+      knot.rotation.x += 0.005;
+      knot.rotation.y += 0.008;
+
+      points.rotation.y -= 0.0015;
+      points.position.y = Math.sin(t * 0.6) * 0.08;
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    };
+    tick();
+
+    // Extra: confetti on click anywhere
+    addEventListener("pointerdown", (e) => {
+      const x = e.clientX / innerWidth;
+      const y = e.clientY / innerHeight;
+      confetti({ particleCount: 80, spread: 70, origin: { x, y } });
+    });
+  </script>
+</body>
+</html>
