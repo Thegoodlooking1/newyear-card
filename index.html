@@ -325,4 +325,207 @@
 
     for (let i = 0; i < starCount; i++) {
       const i3 = i * 3;
-      // Spread in
+      // Spread in a loose volume
+      positions[i3 + 0] = (Math.random() - 0.5) * 14;
+      positions[i3 + 1] = (Math.random() - 0.5) * 8;
+      positions[i3 + 2] = (Math.random() - 0.5) * 12;
+
+      const c = palette[(Math.random() * palette.length) | 0];
+      colors[i3 + 0] = c.r;
+      colors[i3 + 1] = c.g;
+      colors[i3 + 2] = c.b;
+    }
+
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geom.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+    const mat = new THREE.PointsMaterial({
+      size: 0.045,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.85,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+
+    const points = new THREE.Points(geom, mat);
+    scene.add(points);
+
+    // Energy planes (soft neon gradients)
+    function makePlane(colorA, colorB, y, speed) {
+      const planeGeo = new THREE.PlaneGeometry(14, 3, 1, 1);
+      // Simple shader-ish look via MeshBasic + vertex colors gradient
+      const planeColors = new Float32Array(4 * 3);
+      const ca = new THREE.Color(colorA);
+      const cb = new THREE.Color(colorB);
+      // top two vertices A, bottom two vertices B
+      // PlaneGeometry vertex order depends, but gradient will still read as a band
+      for (let v = 0; v < 4; v++) {
+        const isTop = v < 2;
+        const cc = isTop ? ca : cb;
+        planeColors[v * 3 + 0] = cc.r;
+        planeColors[v * 3 + 1] = cc.g;
+        planeColors[v * 3 + 2] = cc.b;
+      }
+      planeGeo.setAttribute("color", new THREE.BufferAttribute(planeColors, 3));
+
+      const planeMat = new THREE.MeshBasicMaterial({
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.10,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        side: THREE.DoubleSide
+      });
+
+      const mesh = new THREE.Mesh(planeGeo, planeMat);
+      mesh.position.set(0, y, -2.2);
+      mesh.userData.speed = speed;
+      scene.add(mesh);
+      return mesh;
+    }
+
+    const band1 = makePlane("#00ffff", "#ff00ff", 1.7, 0.35);
+    const band2 = makePlane("#7cff00", "#00a3ff", -1.4, 0.28);
+
+    // Mouse parallax
+    let mx = 0, my = 0;
+    window.addEventListener("mousemove", (e) => {
+      const nx = (e.clientX / innerWidth) * 2 - 1;
+      const ny = (e.clientY / innerHeight) * 2 - 1;
+      mx = nx;
+      my = ny;
+    });
+
+    function resize() {
+      const w = innerWidth;
+      const h = innerHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    const clock = new THREE.Clock();
+
+    function animate() {
+      const t = clock.getElapsedTime();
+
+      // Parallax drift
+      camera.position.x = THREE.MathUtils.lerp(camera.position.x, mx * 0.35, 0.06);
+      camera.position.y = THREE.MathUtils.lerp(camera.position.y, -my * 0.22, 0.06);
+      camera.lookAt(0, 0, 0);
+
+      // Slow swirl
+      points.rotation.y = t * 0.08;
+      points.rotation.x = Math.sin(t * 0.22) * 0.06;
+
+      // Move energy bands horizontally (wrap)
+      for (const band of [band1, band2]) {
+        band.position.x = ((t * band.userData.speed) % 6) - 3;
+        band.rotation.z = Math.sin(t * 0.9) * 0.05;
+      }
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // -----------------------------
+    // Confetti (mouse-follow)
+    // -----------------------------
+    const confCanvas = document.getElementById("confetti");
+    const ctx = confCanvas.getContext("2d");
+
+    function resizeConf() {
+      confCanvas.width = Math.floor(innerWidth * Math.min(devicePixelRatio, 2));
+      confCanvas.height = Math.floor(innerHeight * Math.min(devicePixelRatio, 2));
+      confCanvas.style.width = innerWidth + "px";
+      confCanvas.style.height = innerHeight + "px";
+      ctx.setTransform(Math.min(devicePixelRatio, 2), 0, 0, Math.min(devicePixelRatio, 2), 0, 0);
+    }
+    window.addEventListener("resize", resizeConf);
+    resizeConf();
+
+    const pieces = [];
+    const neon = ["#00ffff", "#ff00ff", "#7cff00", "#00a3ff", "#ff3b3b"];
+
+    function spawnConfetti(x, y, amount = 18, force = 1) {
+      for (let i = 0; i < amount; i++) {
+        const angle = (Math.random() * Math.PI * 2);
+        const speed = (2 + Math.random() * 5) * force;
+
+        pieces.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - (2.2 * force),
+          g: 0.16 + Math.random() * 0.07,
+          r: 2 + Math.random() * 4,
+          a: 1,
+          spin: (Math.random() - 0.5) * 0.4,
+          rot: Math.random() * Math.PI,
+          color: neon[(Math.random() * neon.length) | 0],
+          life: 70 + (Math.random() * 40) | 0
+        });
+      }
+    }
+
+    let last = { x: innerWidth * 0.5, y: innerHeight * 0.4 };
+    window.addEventListener("mousemove", (e) => {
+      const dx = e.clientX - last.x;
+      const dy = e.clientY - last.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist > 10) {
+        spawnConfetti(e.clientX, e.clientY, Math.min(24, 8 + (dist / 8) | 0), 0.75);
+        last = { x: e.clientX, y: e.clientY };
+      }
+    }, { passive: true });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key.toLowerCase() === "c") {
+        spawnConfetti(innerWidth * 0.35, innerHeight * 0.42, 220, 1.3);
+      }
+    });
+
+    function tickConfetti() {
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+      for (let i = pieces.length - 1; i >= 0; i--) {
+        const p = pieces[i];
+        p.vy += p.g;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.spin;
+        p.life -= 1;
+        p.a = Math.max(0, p.life / 110);
+
+        // wrap-ish drift
+        if (p.y > innerHeight + 80 || p.x < -80 || p.x > innerWidth + 80 || p.a <= 0) {
+          pieces.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.globalAlpha = p.a;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+
+        // little neon glow
+        ctx.shadowBlur = 14;
+        ctx.shadowColor = p.color;
+        ctx.fillStyle = p.color;
+
+        // confetti “chip”
+        ctx.fillRect(-p.r, -p.r * 0.6, p.r * 2.2, p.r * 1.1);
+
+        ctx.restore();
+      }
+
+      requestAnimationFrame(tickConfetti);
+    }
+    tickConfetti();
+  </script>
+</body>
+</html>
