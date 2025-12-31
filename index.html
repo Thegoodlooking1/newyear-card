@@ -1,261 +1,338 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>New Year Card</title>
-  <meta name="description" content="A tiny brutalist New Year greeting. Tap for confetti." />
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>New Year</title>
   <style>
     :root{
       --bg:#000;
       --fg:#fff;
-      --muted:rgba(255,255,255,.65);
-      --grid-gap: clamp(14px, 2.2vw, 22px);
+      --muted: rgba(255,255,255,.65);
+      --grid: rgba(255,255,255,.08);
     }
-
-    /* brutalist-ish system stack; falls back well on iOS/Android */
-    html,body{height:100%;}
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
     body{
       margin:0;
       background:var(--bg);
       color:var(--fg);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-family: "Impact", "Haettenschweiler", "Arial Black", "Franklin Gothic Heavy", system-ui, sans-serif;
+      letter-spacing: .2px;
       overflow:hidden;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: geometricPrecision;
     }
 
-    /* Swiss-ish grid layout (simple + responsive) */
+    /* Swiss-ish grid background (subtle) */
+    .bg-grid{
+      position:fixed; inset:0;
+      background:
+        linear-gradient(to right, var(--grid) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity:.6;
+      pointer-events:none;
+    }
+
+    /* Layout */
     .wrap{
       position:relative;
       height:100%;
-      padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right))
-               max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
       display:grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: var(--grid-gap);
-      align-items:start;
+      grid-template-columns: 1fr minmax(0, 720px) 1fr;
+      padding: 24px;
     }
-
-    header{
-      grid-column: 1 / -1;
-      display:flex;
-      flex-direction:column;
-      gap: 10px;
+    .main{
+      grid-column:2;
+      display:grid;
+      grid-template-rows:auto auto 1fr auto;
+      gap: 18px;
+      align-content:start;
+      padding-top: 28px;
     }
 
     .kicker{
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      font-size: 12px;
+      font-size: 14px;
+      text-transform: uppercase;
       color: var(--muted);
     }
-
     h1{
       margin:0;
-      font-size: clamp(34px, 6vw, 64px);
+      font-size: clamp(34px, 5vw, 64px);
       line-height: .95;
-      letter-spacing: -0.02em;
-      font-weight: 700;
+      text-transform: uppercase;
     }
-
     .msg{
-      grid-column: 1 / -1;
-      max-width: 48ch;
-      font-size: clamp(16px, 2.2vw, 20px);
-      line-height: 1.35;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 16px;
+      line-height: 1.55;
+      white-space: pre-wrap; /* allows paragraph length */
+      max-width: 68ch;
       color: rgba(255,255,255,.92);
     }
-
-    .meta{
-      grid-column: 1 / -1;
-      display:flex;
-      flex-wrap:wrap;
-      gap: 10px 18px;
-      margin-top: 6px;
+    .hint{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
       color: var(--muted);
       font-size: 13px;
     }
 
-    .tap{
-      position:absolute;
-      left: 18px;
-      bottom: 18px;
-      right: 18px;
-      color: rgba(255,255,255,.65);
-      font-size: 12px;
-      letter-spacing:.06em;
-      text-transform:uppercase;
-      pointer-events:none;
-    }
-
-    /* Confetti canvas always on top, but not blocking taps */
+    /* Confetti canvas */
     canvas{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
+      position:fixed; inset:0;
       pointer-events:none;
     }
 
-    /* Subtle brutalist divider line */
-    .line{
-      width: 100%;
-      height:1px;
-      background: rgba(255,255,255,.18);
-      margin-top: 4px;
+    /* Mobile spacing */
+    @media (max-width: 820px){
+      .wrap{ grid-template-columns: 1fr; padding: 18px; }
+      .main{ grid-column:1; padding-top: 18px; }
+      .msg{ font-size: 15px; }
+    }
+
+    /* Reduce motion */
+    @media (prefers-reduced-motion: reduce){
+      .bg-grid{ opacity:.35; }
     }
   </style>
 </head>
-
 <body>
-  <div class="wrap" id="wrap">
-    <canvas id="confetti"></canvas>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <canvas id="c"></canvas>
 
-    <header>
-      <div class="kicker" id="kicker"></div>
+  <div class="wrap">
+    <div class="main">
+      <div class="kicker" id="kicker">Tap anywhere for confetti</div>
       <h1 id="title">Happy New Year.</h1>
-      <div class="line"></div>
-    </header>
-
-    <div class="msg" id="message">
-      Wishing you a clean start and loud momentum. <br/>
-      Tap anywhere for confetti.
+      <div class="msg" id="message"></div>
+      <div class="hint" id="hint"></div>
     </div>
-
-    <!-- <div class="meta">
-      <div id="toLine">To: Friend</div>
-      <div id="fromLine">From: Ingsa</div>
-      <div id="yearLine">Year: 2026</div>
-    </div> -->
-
-    <div class="tap">Tap / Click anywhere → confetti</div>
   </div>
 
   <script>
-    /**
-     * Personalization via URL parameters:
-     *   ?to=Annie&from=Ingsa&msg=Big%20energy%20in%202026!&year=2026
-     */
+    // ------------- Personalised messages -------------
+    // Keys must match ?to=____ in the URL
+    const MESSAGES = {
+      choekyi: {
+        title: "Happy New Year, Choekyi.",
+        text:
+`I’m really grateful I met you.
+Thank you for seeing me without trying to fix me, and for being gentle without judging.
+You’ve helped me untangle more than you know.
+Wishing you a year that feels protected, lucky, and full.`
+      },
+
+      yash: {
+        title: "Happy New Year, Yash.",
+        text:
+`Grateful I met you this year.
+New friendships don’t always happen easily as adults. This one did.
+Thanks for the push and the example. You’ve genuinely made me want to go after my own dreams harder.`
+      },
+
+      pema: {
+        title: "Happy New Year, Pema.",
+        text:
+`Bro… you’ve been running all year and you’re still somehow slower than me and I haven’t run a 5K in ages. 😭
+Keep it up though. I’m expecting you to level up and become my family doctor soon fucker. But no pressure.`
+      },
+
+      enoch: {
+        title: "Happy New Year, Enoch.",
+        text:
+`Really glad we connected this year; shoutout Sagun for the link-up.
+I’ve loved the long talks at Zongri. It’s been real, and it’s helped.
+Wishing you a solid, steady year.`
+      },
+
+      sagun: {
+        title: "Happy New Year, Sagun.",
+        text:
+`This year it was honestly fun reconnecting.
+Somehow between you, Sim, and Tenchung, I talked to you the least but I think that just set us up for a deeper link when it finally happened.
+I love how we can talk and dissect our childhood like it’s a documentary.
+May next year bring you a lot of “Saaaguuuunnn.”`
+      },
+
+      shreya: {
+        title: "Happy New Year, Shreya.",
+        text:
+`I’m really glad I got to know you this year.
+I still owe you that coffee from today.
+Wishing you a year full of luck, prosperity, and good surprises.`
+      },
+
+      simran: {
+        title: "Happy New Year, Sim.",
+        text:
+`Thank you for being a constant ever since I’ve been back from America.
+I don’t say it enough, but I really appreciate you.
+Also thank you for leading the way with the big life milestones. Watching you take real steps gives me courage.
+Wishing you a year full of luck, prosperity, and blessings.`
+      },
+
+      tenchung: {
+        title: "Happy New Year, Tenchung.",
+        text:
+`I’m really grateful our friendship properly formed after I came back from America.
+I’ve learned a lot from you especially how you let yourself feel things fully, without judging yourself for it.
+That’s something I’m taking with me into this year.`
+      },
+
+      kitsho: {
+        title: "Happy New Year, Kitsho.",
+        text:
+`Hope you have a beautiful new year.
+I’ve learned a lot from you, and I really admire your honesty and your kindness.
+Wishing you a strong, peaceful year ahead.`
+      },
+
+      sherap: {
+        title: "Happy New Year, Sherap.",
+        text:
+`Really grateful for our friendship.
+Wishing you a year full of blessings and a lot of laughter.`
+      },
+
+      aditi: {
+        title: "Happy New Year, Aditi.",
+        text:
+`Hey babymama, happy new year. 😌
+Please take care of the in-laws for me.
+Wishing you a year full of blessings and prosperity.`
+      },
+
+      sanskruti: {
+        title: "Happy New Year, Sanskruti.",
+        text:
+`You need to stop sending me “fat guy” reels. 😭
+With that being said wishing you a year full of blessings and prosperity.
+And keep up the great work too.`
+      },
+
+      mosesda: {
+        title: "Happy New Year, Moses Da.",
+        text:
+`Hope the new year brings you loads of luck and prosperity.
+Wishing you a strong year ahead.`
+      },
+
+      aj_sensorium: {
+        title: "Happy New Year, AJ & Sensorium.",
+        text:
+`May the new year bring you more work, more money, more blessings
+and less drama.`
+      },
+
+      pema_madhavi_kuna: {
+        title: "Happy New Year, Pema, Maddhi & Kuna.",
+        text:
+`May the new year bring you more projects you actually want to work on,
+more blessings, and more money.`
+      }
+    };
+
+    // Fallback message
+    const DEFAULT = {
+      title: "Happy New Year.",
+      text:
+`Wishing you a clean start, good health, and momentum.
+Tap anywhere for confetti.`
+    };
+
+    // Read URL param ?to=
     const params = new URLSearchParams(location.search);
-    const to = params.get("to") || "Friend";
-    const from = params.get("from") || "Ingsa";
-    const msg = params.get("msg") || "Wishing you a clean start and loud momentum.\nTap anywhere for confetti.";
-    const year = params.get("year") || "2026";
-    const title = params.get("title") || "Happy New Year.";
+    const key = (params.get("to") || "").toLowerCase().trim();
 
-    document.getElementById("title").textContent = title;
-    document.getElementById("message").innerHTML = msg.replace(/\n/g, "<br/>");
-    document.getElementById("toLine").textContent = `To: ${to}`;
-    document.getElementById("fromLine").textContent = `From: ${from}`;
-    document.getElementById("yearLine").textContent = `Year: ${year}`;
+    const data = MESSAGES[key] || DEFAULT;
 
-    // Ultra-light confetti (no libraries)
-    const canvas = document.getElementById("confetti");
-    const ctx = canvas.getContext("2d", { alpha: true });
+    document.getElementById("title").textContent = data.title;
+    document.getElementById("message").textContent = data.text;
+
+    // Optional hint that shows the exact link key (useful for you while testing)
+    const hint = document.getElementById("hint");
+    hint.textContent = MESSAGES[key] ? "" : "Tip: add ?to=choekyi (or others) to the link";
+
+    // ------------- Lightweight confetti (tap/click to pop) -------------
+    const canvas = document.getElementById("c");
+    const ctx = canvas.getContext("2d");
 
     function resize(){
       const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
       canvas.width = Math.floor(innerWidth * dpr);
       canvas.height = Math.floor(innerHeight * dpr);
+      canvas.style.width = innerWidth + "px";
+      canvas.style.height = innerHeight + "px";
       ctx.setTransform(dpr,0,0,dpr,0,0);
     }
-    addEventListener("resize", resize, { passive: true });
+    window.addEventListener("resize", resize, {passive:true});
     resize();
 
-    const confettiPieces = [];
-    let animating = false;
+    const confetti = [];
+    const COLORS = ["#fff"]; // black/white scheme
 
-    // keep grayscale brutalist: white/gray only
-    const COLORS = ["#fff", "rgba(255,255,255,.85)", "rgba(255,255,255,.65)"];
-
-    function burst(x, y){
-      const count = 90; // light enough for phones
-      for(let i=0;i<count;i++){
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 2 + Math.random() * 6;
-        confettiPieces.push({
+    function pop(x,y,amount=90){
+      for(let i=0;i<amount;i++){
+        confetti.push({
           x, y,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed - (2 + Math.random()*3),
-          g: 0.16 + Math.random()*0.12,
-          r: (Math.random()*6) + 2,     // size
-          h: (Math.random()*10) + 6,    // size
-          rot: Math.random() * Math.PI,
-          vr: (Math.random() - 0.5) * 0.25,
-          life: 0,
-          ttl: 90 + Math.random()*40,
-          color: COLORS[(Math.random()*COLORS.length)|0],
-          shape: Math.random() < 0.25 ? "line" : "rect"
+          vx: (Math.random()-0.5)*10,
+          vy: (Math.random()-1.2)*12,
+          g: 0.35 + Math.random()*0.2,
+          s: 2 + Math.random()*4,
+          r: Math.random()*Math.PI*2,
+          vr: (Math.random()-0.5)*0.25,
+          life: 90 + Math.random()*40,
+          color: COLORS[0],
+          shape: Math.random() < 0.5 ? "rect" : "line"
         });
       }
-      if(!animating){
-        animating = true;
-        requestAnimationFrame(tick);
-      }
-      // tiny haptic on supported phones
-      if (navigator.vibrate) navigator.vibrate(10);
     }
 
-    function tick(){
+    function step(){
       ctx.clearRect(0,0,innerWidth,innerHeight);
 
-      for(let i=confettiPieces.length-1; i>=0; i--){
-        const p = confettiPieces[i];
-        p.life++;
+      for(let i=confetti.length-1;i>=0;i--){
+        const p = confetti[i];
         p.vy += p.g;
         p.x += p.vx;
         p.y += p.vy;
-        p.rot += p.vr;
+        p.r += p.vr;
+        p.life -= 1;
 
-        const alpha = Math.max(0, 1 - (p.life / p.ttl));
+        // fade out near the end
+        const alpha = Math.max(0, Math.min(1, p.life/60));
         ctx.globalAlpha = alpha;
         ctx.strokeStyle = p.color;
         ctx.fillStyle = p.color;
 
         ctx.save();
         ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
+        ctx.rotate(p.r);
 
-        if (p.shape === "line"){
+        if(p.shape === "rect"){
+          ctx.fillRect(-p.s/2, -p.s/2, p.s*1.2, p.s*0.8);
+        }else{
           ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.moveTo(-p.h, 0);
-          ctx.lineTo(p.h, 0);
+          ctx.moveTo(-p.s, 0);
+          ctx.lineTo(p.s, 0);
           ctx.stroke();
-        } else {
-          ctx.fillRect(-p.r, -p.h/2, p.r*2, p.h);
         }
         ctx.restore();
 
-        // remove if out of life or far off screen
-        if(p.life > p.ttl || p.y > innerHeight + 60 || p.x < -60 || p.x > innerWidth + 60){
-          confettiPieces.splice(i,1);
-        }
+        if(p.life <= 0 || p.y > innerHeight + 60) confetti.splice(i,1);
       }
-
       ctx.globalAlpha = 1;
-
-      if(confettiPieces.length){
-        requestAnimationFrame(tick);
-      } else {
-        animating = false;
-      }
+      requestAnimationFrame(step);
     }
+    step();
 
-    // Mobile-first interaction: tap anywhere
-    // Use pointer events for both mouse + touch, passive for performance.
-    const wrap = document.getElementById("wrap");
+    // Desktop click
+    window.addEventListener("pointerdown", (e)=>{
+      pop(e.clientX, e.clientY, 80);
+    }, {passive:true});
 
-    wrap.addEventListener("pointerdown", (e) => {
-      // prevent double-tap zoom on iOS Safari-ish behaviour
-      // (we keep it minimal; no preventDefault needed for pointerdown)
-      burst(e.clientX, e.clientY);
-    }, { passive: true });
-
-    // Optional: auto-burst once on load (tiny)
-    setTimeout(() => burst(Math.min(120, innerWidth*0.25), Math.min(160, innerHeight*0.3)), 250);
+    // Small “auto” pop on load (very light)
+    setTimeout(()=>pop(innerWidth*0.25, innerHeight*0.35, 60), 250);
+    setTimeout(()=>pop(innerWidth*0.65, innerHeight*0.45, 60), 450);
   </script>
 </body>
 </html>
