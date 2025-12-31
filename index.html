@@ -2,271 +2,255 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Happy New Year ✨</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Happy New Year</title>
+
   <style>
-    :root{
-      --bg1:#07070b; --bg2:#0b1020; --card:#0f172a; --text:#e7e9ff; --muted:#aab1d6;
-      --accent:#8b5cf6; --accent2:#22c55e;
+    :root {
+      --bg: #ffffff;
+      --fg: #000000;
+      --border: 2px solid #000;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
-    html,body{height:100%; margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;}
-    body{
-      overflow:hidden;
-      background: radial-gradient(1200px 800px at 20% 10%, #1b1a45 0%, var(--bg1) 45%, var(--bg2) 100%);
-      color:var(--text);
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
     }
-    #three { position:fixed; inset:0; z-index:0; }
-    .grain{
-      pointer-events:none;
-      position:fixed; inset:0; z-index:1;
-      opacity:.12; mix-blend-mode:overlay;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--mono);
+      overflow: hidden;
     }
-    .wrap{
-      position:relative; z-index:2;
-      height:100%; display:grid; place-items:center;
-      padding:20px;
+
+    /* Three.js background */
+    #three {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.15;
     }
-    .card{
-      width:min(720px, 94vw);
-      background: linear-gradient(180deg, rgba(15,23,42,.82), rgba(15,23,42,.62));
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 28px;
-      box-shadow: 0 30px 80px rgba(0,0,0,.45);
-      padding: 28px 26px;
-      backdrop-filter: blur(10px);
-      transform: translateZ(0);
-      animation: float 4.5s ease-in-out infinite;
+
+    /* Confetti canvas */
+    #confetti {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
     }
-    @keyframes float { 0%,100%{ transform: translateY(0)} 50%{ transform: translateY(-8px)} }
-    .top{
-      display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
-      margin-bottom: 14px;
+
+    main {
+      position: relative;
+      z-index: 2;
+      padding: 48px 24px;
+      max-width: 820px;
     }
-    .pill{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:10px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      font-size: 14px;
-      color: var(--muted);
+
+    .card {
+      border: var(--border);
+      padding: 24px;
+      background: #fff;
     }
-    .dot{ width:10px; height:10px; border-radius:99px; background: linear-gradient(45deg,var(--accent),#60a5fa); box-shadow:0 0 18px rgba(139,92,246,.6); }
-    h1{
-      margin: 14px 0 6px;
-      font-size: clamp(30px, 5vw, 54px);
-      line-height: 1.05;
-      letter-spacing: -0.02em;
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: var(--border);
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
     }
-    h1 .name{
-      background: linear-gradient(90deg, #f472b6, #60a5fa, #34d399, #f59e0b);
-      -webkit-background-clip: text; background-clip:text; color: transparent;
-      filter: drop-shadow(0 12px 26px rgba(0,0,0,.25));
+
+    h1 {
+      margin: 0 0 12px 0;
+      font-size: 32px;
+      line-height: 1.1;
     }
-    p{
-      margin: 10px 0;
-      color: var(--muted);
+
+    p {
+      margin: 0 0 16px 0;
+      font-family: var(--sans);
       font-size: 16px;
-      line-height: 1.55;
+      line-height: 1.45;
+      max-width: 60ch;
     }
-    .buttons{
-      display:flex; gap:10px; flex-wrap:wrap;
-      margin-top: 16px;
+
+    .controls {
+      border-top: var(--border);
+      padding-top: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
     }
-    button{
-      appearance:none; border:none; cursor:pointer;
-      border-radius: 16px;
-      padding: 12px 14px;
-      background: rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.14);
-      color:var(--text);
-      font-weight:650;
-      letter-spacing:.01em;
-      transition: transform .08s ease, background .2s ease;
+
+    button {
+      font: inherit;
+      background: #fff;
+      color: #000;
+      border: var(--border);
+      padding: 10px 14px;
+      cursor: pointer;
     }
-    button:hover{ background: rgba(255,255,255,.12); }
-    button:active{ transform: translateY(1px) scale(.99); }
-    .primary{
-      background: linear-gradient(135deg, rgba(139,92,246,.95), rgba(34,197,94,.92));
-      border: none;
-      box-shadow: 0 14px 40px rgba(139,92,246,.25);
+
+    button:hover {
+      background: #000;
+      color: #fff;
     }
-    .footer{
-      margin-top: 14px;
-      display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap;
-      font-size: 13px; color: rgba(231,233,255,.72);
+
+    .footer {
+      border-top: var(--border);
+      margin-top: 18px;
+      padding-top: 12px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
     }
-    .tiny{ opacity:.75; }
-    a{ color: rgba(231,233,255,.9); }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid #000;
+    }
+
+    a:hover {
+      background: #000;
+      color: #fff;
+    }
   </style>
 </head>
 
 <body>
   <canvas id="three"></canvas>
-  <div class="grain"></div>
+  <canvas id="confetti"></canvas>
 
-  <div class="wrap">
-    <div class="card">
-      <div class="top">
-        <div class="pill"><span class="dot"></span><span id="yearLabel">Happy New Year</span></div>
-        <div class="pill">✨ playful • confetti • coded</div>
+  <main>
+    <section class="card">
+      <div class="header">
+        <div>Transmission</div>
+        <div id="yearLabel">New Year</div>
       </div>
 
       <h1>
-        Hey <span class="name" id="toName">friend</span> —<br>
-        here’s to <span id="yearText"></span> 🥂
+        Happy New Year,<br />
+        <span id="toName">Friend</span>.
       </h1>
 
       <p id="messageLine">
-        Wishing you a year full of health, momentum, and small daily wins that quietly change everything.
+        Wishing you a year of momentum, clarity, and good chaos.
+        This card is handmade. In code.
       </p>
 
-      <p class="tiny" id="noteLine" style="display:none;"></p>
-
-      <div class="buttons">
-        <button class="primary" id="celebrateBtn">Celebrate 🎉</button>
-        <button id="moreBtn">More confetti ✨</button>
-        <button id="copyBtn">Copy my link 🔗</button>
+      <div class="controls">
+        <button id="celebrateBtn">CONFETTI</button>
+        <button id="moreBtn">MORE</button>
+        <button id="copyBtn">COPY LINK</button>
       </div>
 
       <div class="footer">
-        <div>From <strong id="fromName">Ingsa</strong></div>
-        <div class="tiny">Tip: add <code>?to=Name&from=You&note=...</code></div>
+        <div>— <span id="fromName">Ingsa</span></div>
+        <div><a href="#" id="toggle3d">Toggle 3D</a></div>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 
   <!-- Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
-  <!-- Three.js (module) -->
+  <!-- Three.js + logic -->
   <script type="module">
     import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 
-    // --- Personalization from URL ---
+    /* -------- Personalisation -------- */
     const params = new URLSearchParams(location.search);
-    const to = params.get("to") || "friend";
+    const to = params.get("to") || "Friend";
     const from = params.get("from") || "Ingsa";
-    const note = params.get("note");
-    const msg = params.get("msg");
 
-    const now = new Date();
-    const year = now.getFullYear() + 1; // Jan 1 edge? still cute as "next year"
-    document.getElementById("yearText").textContent = String(year);
-    document.getElementById("yearLabel").textContent = `Happy New Year ${year}`;
+    const year = new Date().getFullYear() + 1;
+
     document.getElementById("toName").textContent = to;
     document.getElementById("fromName").textContent = from;
+    document.getElementById("yearLabel").textContent = year;
 
-    if (msg) document.getElementById("messageLine").textContent = msg;
-    if (note) {
-      const el = document.getElementById("noteLine");
-      el.style.display = "block";
-      el.textContent = `PS — ${note}`;
-    }
+    /* -------- Confetti -------- */
+    const blast = (count = 140) =>
+      confetti({
+        particleCount: count,
+        spread: 90,
+        startVelocity: 40,
+        colors: ["#000000", "#ffffff"],
+        origin: { y: 0.6 }
+      });
 
-    // --- Confetti helpers ---
-    const fire = (opts={}) => confetti({
-      particleCount: 120,
-      spread: 85,
-      origin: { y: 0.65 },
-      scalar: 1.0,
-      ...opts
-    });
+    setTimeout(() => blast(100), 300);
 
-    const burst = () => {
-      fire({ startVelocity: 45, particleCount: 160 });
-      fire({ spread: 120, particleCount: 90, scalar: 0.9 });
-      fire({ spread: 60,  particleCount: 60, scalar: 1.15 });
-    };
+    document.getElementById("celebrateBtn").onclick = () => blast(160);
+    document.getElementById("moreBtn").onclick = () => blast(260);
 
-    // Auto confetti on load (gentle)
-    setTimeout(() => fire({ particleCount: 90, spread: 70, startVelocity: 35 }), 250);
-
-    document.getElementById("celebrateBtn").addEventListener("click", burst);
-    document.getElementById("moreBtn").addEventListener("click", () => fire({ particleCount: 220, spread: 110 }));
-
-    document.getElementById("copyBtn").addEventListener("click", async () => {
+    document.getElementById("copyBtn").onclick = async () => {
       try {
         await navigator.clipboard.writeText(location.href);
-        fire({ particleCount: 60, spread: 55, origin: { y: 0.8 } });
+        blast(80);
       } catch {
-        alert("Copy failed — you can manually copy the URL from the address bar.");
+        alert("Copy failed");
       }
-    });
+    };
 
-    // --- Three.js background ---
+    /* -------- Three.js (brutalist wireframe) -------- */
     const canvas = document.getElementById("three");
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    let enabled = true;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
-    camera.position.set(0, 0.25, 6);
+    const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+    camera.position.z = 6;
 
-    const ambient = new THREE.AmbientLight(0xffffff, 0.55);
-    scene.add(ambient);
-
-    const key = new THREE.DirectionalLight(0xffffff, 0.9);
-    key.position.set(4, 3, 6);
-    scene.add(key);
-
-    // Fun object (toroid knot) + "confetti-ish" particles
-    const knotGeo = new THREE.TorusKnotGeometry(1.05, 0.35, 180, 18);
-    const knotMat = new THREE.MeshStandardMaterial({
-      metalness: 0.6,
-      roughness: 0.25,
-      color: 0x8b5cf6,
-      emissive: 0x111122,
+    const geo = new THREE.IcosahedronGeometry(2.3, 2);
+    const mat = new THREE.MeshBasicMaterial({
+      color: 0x000000,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.6
     });
-    const knot = new THREE.Mesh(knotGeo, knotMat);
-    knot.position.set(1.2, -0.2, 0);
-    scene.add(knot);
 
-    const pCount = 900;
-    const positions = new Float32Array(pCount * 3);
-    for (let i = 0; i < pCount; i++) {
-      positions[i*3+0] = (Math.random() - 0.5) * 14;
-      positions[i*3+1] = (Math.random() - 0.5) * 8;
-      positions[i*3+2] = (Math.random() - 0.5) * 10;
-    }
-    const pGeo = new THREE.BufferGeometry();
-    pGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    const pMat = new THREE.PointsMaterial({ size: 0.03, transparent: true, opacity: 0.8 });
-    const points = new THREE.Points(pGeo, pMat);
-    scene.add(points);
+    const mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
 
-    // Resize
-    const onResize = () => {
-      const w = innerWidth, h = innerHeight;
-      renderer.setSize(w, h, false);
-      camera.aspect = w / h;
+    function resize() {
+      renderer.setSize(innerWidth, innerHeight);
+      camera.aspect = innerWidth / innerHeight;
       camera.updateProjectionMatrix();
+    }
+
+    addEventListener("resize", resize);
+    resize();
+
+    function animate() {
+      if (enabled) {
+        mesh.rotation.x += 0.002;
+        mesh.rotation.y += 0.003;
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    document.getElementById("toggle3d").onclick = (e) => {
+      e.preventDefault();
+      enabled = !enabled;
+      canvas.style.display = enabled ? "block" : "none";
     };
-    addEventListener("resize", onResize);
-    onResize();
-
-    // Animate
-    let t = 0;
-    const tick = () => {
-      t += 0.01;
-      knot.rotation.x += 0.005;
-      knot.rotation.y += 0.008;
-
-      points.rotation.y -= 0.0015;
-      points.position.y = Math.sin(t * 0.6) * 0.08;
-
-      renderer.render(scene, camera);
-      requestAnimationFrame(tick);
-    };
-    tick();
-
-    // Extra: confetti on click anywhere
-    addEventListener("pointerdown", (e) => {
-      const x = e.clientX / innerWidth;
-      const y = e.clientY / innerHeight;
-      confetti({ particleCount: 80, spread: 70, origin: { x, y } });
-    });
   </script>
 </body>
 </html>
